@@ -27,14 +27,13 @@ import se.akerfeldt.okhttp.signpost.SigningInterceptor
 class MainActivityModule(val activity: MainActivity) {
 
     @Provides
-    @MainActivityScope
+
     fun provideObjectMapper(): ObjectMapper {
         return ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
     }
 
     @Provides
-    @MainActivityScope
     fun provideTwitterApi(objectMapper: ObjectMapper): TwitterApi {
         val consumer = OkHttpOAuthConsumer(BuildConfig.TWITTER_KEY, BuildConfig.TWITTER_SECRET)
         //by this time we have a valid token
@@ -52,13 +51,11 @@ class MainActivityModule(val activity: MainActivity) {
     }
 
     @Provides
-    @MainActivityScope
     fun provideTweetRepository(twitterApi: TwitterApi, objectMapper: ObjectMapper): TweetRepository {
         return DefaultTweetRepository(twitterApi, objectMapper)
     }
 
     @Provides
-    @MainActivityScope
     fun provideMainPresenter(tweetRepository: TweetRepository): MainPresenter {
         return DefaultMainPresenter(activity, tweetRepository)
     }

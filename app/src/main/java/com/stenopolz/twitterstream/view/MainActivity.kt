@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.stenopolz.twitterstream.App
 import com.stenopolz.twitterstream.R
-import com.stenopolz.twitterstream.di.MainActivityScope
 import com.stenopolz.twitterstream.model.TweetRepository
 import com.stenopolz.twitterstream.model.models.Tweet
 import com.stenopolz.twitterstream.presenter.MainPresenter
@@ -14,7 +13,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), MainView {
 
     @Inject
-    @MainActivityScope
+
     lateinit var presenter: MainPresenter
     @Inject
     lateinit var repository: TweetRepository

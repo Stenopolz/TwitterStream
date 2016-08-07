@@ -14,7 +14,6 @@ import dagger.Provides
 class LoginActivityModule(val activity: LoginActivity) {
 
     @Provides
-    @LoginActivityScope
     fun provideLoginPresenter(): LoginPresenter {
         return DefaultLoginPresenter(activity)
     }

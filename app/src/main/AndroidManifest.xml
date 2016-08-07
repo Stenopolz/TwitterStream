@@ -19,7 +19,7 @@
             android:name="io.fabric.ApiKey"
             android:value="e3ca80321c00b26b4735622bd472c04bd0fb26ce"/>
 
-        <activity android:name=".LoginActivity">
+        <activity android:name=".view.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

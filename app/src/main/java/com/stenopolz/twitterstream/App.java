@@ -5,6 +5,9 @@ import android.support.annotation.NonNull;
 
 import com.stenopolz.twitterstream.di.ApplicationComponent;
 import com.stenopolz.twitterstream.di.DaggerApplicationComponent;
+import com.stenopolz.twitterstream.di.DaggerLoginActivityComponent;
+import com.stenopolz.twitterstream.di.DaggerMainActivityComponent;
+import com.stenopolz.twitterstream.di.LoginActivityComponent;
 import com.stenopolz.twitterstream.di.LoginActivityModule;
 import com.stenopolz.twitterstream.di.MainActivityComponent;
 import com.stenopolz.twitterstream.di.MainActivityModule;
@@ -31,17 +34,17 @@ public class App extends Application {
 
     public void inject(@NonNull MainActivity activity) {
         MainActivityModule activityModule = new MainActivityModule(activity);
-//        DaggerMainActivityComponent component = DaggerMainActivityComponent.builder()
-//                .mainActivityModule(activityModule)
-//                .applicationComponent(applicationComponent).build();
-//        component.inject(activity);
+        MainActivityComponent component = DaggerMainActivityComponent.builder()
+                .mainActivityModule(activityModule)
+                .applicationComponent(applicationComponent).build();
+        component.inject(activity);
     }
 
     public void inject(@NonNull LoginActivity activity) {
         LoginActivityModule activityModule = new LoginActivityModule(activity);
-//        DaggerLoginActivityComponent component = DaggerLoginActivityComponent.builder()
-//                .loginActivityModule(activityModule)
-//                .applicationComponent(applicationComponent).build();
-//        component.inject(activity);
+        LoginActivityComponent component = DaggerLoginActivityComponent.builder()
+                .loginActivityModule(activityModule)
+                .applicationComponent(applicationComponent).build();
+        component.inject(activity);
     }
 }
