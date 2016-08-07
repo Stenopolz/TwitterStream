@@ -26,6 +26,9 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
+    compile "com.google.dagger:dagger:$rootProject.ext.daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$rootProject.ext.daggerVersion"
+    compile "io.reactivex:rxandroid:$rootProject.ext.rxAndroidVersion"
     compile "com.android.support:appcompat-v7:$rootProject.ext.supportLibraryVersion"
     compile "com.android.support:recyclerview-v7:$rootProject.ext.supportLibraryVersion"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -37,7 +40,13 @@ dependencies {
     compile "com.squareup.retrofit2:converter-jackson:$rootProject.ext.retrofitVersion"
     compile "com.fasterxml.jackson.core:jackson-databind:$rootProject.ext.jacksonVersion"
     compile "com.fasterxml.jackson.core:jackson-annotations:$rootProject.ext.jacksonVersion"
+    compile 'se.akerfeldt:okhttp-signpost:1.1.0'
+    compile 'oauth.signpost:signpost-core:1.2.1.2'
+    compile('com.twitter.sdk.android:twitter-core:1.7.0@aar') {
+        transitive = true;
+    }
 }
 repositories {
     mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
 }

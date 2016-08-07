@@ -26,6 +26,8 @@ project.ext {
     retrofitVersion = '2.0.2'
     okhttpVersion = '3.2.0'
     jacksonVersion = '2.6.4'
+    daggerVersion = '2.4'
+    rxAndroidVersion = '1.1.0'
 }
 
 task clean(type: Delete) {
