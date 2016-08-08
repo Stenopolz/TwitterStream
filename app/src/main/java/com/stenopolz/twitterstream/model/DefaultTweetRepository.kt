@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.stenopolz.twitterstream.model.models.Tweet
 import com.stenopolz.twitterstream.model.models.TweetObject
 import okhttp3.ResponseBody
+import retrofit2.adapter.rxjava.HttpException
 import rx.Observable
 import rx.functions.Func1
 import rx.schedulers.Schedulers
@@ -21,17 +22,79 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
     override fun getTweets(searchQuery: String): Observable<Tweet> {
         return api.getFeed(searchQuery, "en")
                 .subscribeOn(Schedulers.io())
-                .retryWhen({ errors ->
-                    errors
-                            .zipWith(Observable.range(0, Int.MAX_VALUE), { any: Any?, i: Int -> i })
-                            .flatMap({ Observable.timer(1 * Math.pow(2.toDouble(), it.toDouble()).toLong(), TimeUnit.MINUTES) })
-                })
                 .flatMap(TransformBodyToStrings())
+                .retryWhen(handle420Error())
+                .retryWhen(handleHTTPError())
+                .retryWhen(handleIOException())
                 .map(ParseTweetObjects(objectMapper))
                 .filter({ tweet -> tweet != null })
     }
 
-    class TransformBodyToStrings : Func1<ResponseBody, Observable<String>> {
+    /*
+        Back off linearly for TCP/IP level network errors.
+        These problems are generally temporary and tend to clear quickly.
+        Increase the delay in reconnects by 250ms each attempt, up to 16 seconds.
+     */
+    private fun handleIOException(): (Observable<out Throwable>) -> Observable<Long> {
+        return { errors ->
+            errors.flatMap({
+                if (it is IOException) {
+                    Observable.just(it)
+                } else {
+                    Observable.error(it as Throwable)
+                }
+            })
+                    .zipWith(Observable.range(0, Int.MAX_VALUE), { any: Any?, i: Int -> i })
+                    .flatMap({
+                        var time = 250 * it
+                        time = if (time <= 16000) time else 16000
+                        Observable.timer(time.toLong(), TimeUnit.MILLISECONDS)
+                    })
+        }
+    }
+
+    /*
+        Back off exponentially for HTTP errors for which reconnecting would be appropriate.
+        Start with a 5 second wait, doubling each attempt, up to 320 seconds.
+     */
+    private fun handleHTTPError(): (Observable<out Throwable>) -> Observable<Long> {
+        return { errors ->
+            errors.flatMap({
+                if (it is HttpException) {
+                    Observable.just(it)
+                } else {
+                    Observable.error(it as Throwable)
+                }
+            })
+                    .zipWith(Observable.range(0, Int.MAX_VALUE), { any: Any?, i: Int -> i })
+                    .flatMap({
+                        var time = 5 * Math.pow(2.toDouble(), it.toDouble()).toLong()
+                        time = if (time <= 320) time else 320
+                        Observable.timer(time, TimeUnit.SECONDS)
+                    })
+        }
+    }
+
+    /*
+        Back off exponentially for HTTP 420 errors. Start with a 1 minute wait and double each attempt.
+        Note that every HTTP 420 received increases the time you must wait
+        until rate limiting will no longer will be in effect for your account.
+     */
+    private fun handle420Error(): (Observable<out Throwable>) -> Observable<Long> {
+        return { errors ->
+            errors.flatMap({
+                if (it is HttpException && it.code() == 420) {
+                    Observable.just(it)
+                } else {
+                    Observable.error(it as Throwable)
+                }
+            })
+                    .zipWith(Observable.range(0, Int.MAX_VALUE), { any: Any?, i: Int -> i })
+                    .flatMap({ Observable.timer(1 * Math.pow(2.toDouble(), it.toDouble()).toLong(), TimeUnit.MINUTES) })
+        }
+    }
+
+    private class TransformBodyToStrings : Func1<ResponseBody, Observable<String>> {
         override fun call(body: ResponseBody): Observable<String> {
             val source = body.source()
             return Observable.create({ subscriber ->
@@ -48,7 +111,7 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
         }
     }
 
-    class ParseTweetObjects(val objectMapper: ObjectMapper) : Func1<String, Tweet> {
+    private class ParseTweetObjects(val objectMapper: ObjectMapper) : Func1<String, Tweet> {
         override fun call(string: String?): Tweet? {
             var tweet: Tweet? = null
             try {

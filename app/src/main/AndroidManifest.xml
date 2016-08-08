@@ -17,6 +17,10 @@
 
         </activity>
 
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="e3ca80321c00b26b4735622bd472c04bd0fb26ce"/>
+
         <activity
             android:name=".view.LoginActivity"
             android:screenOrientation="sensorPortrait">

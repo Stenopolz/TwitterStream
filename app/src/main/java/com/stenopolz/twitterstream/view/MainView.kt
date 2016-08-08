@@ -7,5 +7,8 @@ import com.stenopolz.twitterstream.model.models.Tweet
  * Defines interface for main screen view
  */
 interface MainView {
+    fun setStartEnabled(enabled: Boolean)
+    fun setStopEnabled(enabled: Boolean)
     fun showTweet(tweet: Tweet)
+    fun showError(message: String)
 }
