@@ -18,6 +18,7 @@ import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
 import se.akerfeldt.okhttp.signpost.OkHttpOAuthConsumer
 import se.akerfeldt.okhttp.signpost.SigningInterceptor
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Stenopolz on 07.08.2016.
@@ -45,6 +46,8 @@ class MainActivityModule(val activity: MainActivity) {
                 .addConverterFactory(JacksonConverterFactory.create(objectMapper))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(OkHttpClient.Builder()
+                        .connectTimeout(90, TimeUnit.SECONDS)
+                        .readTimeout(90, TimeUnit.SECONDS)
                         .addInterceptor(SigningInterceptor(consumer))
                         .build())
                 .build()

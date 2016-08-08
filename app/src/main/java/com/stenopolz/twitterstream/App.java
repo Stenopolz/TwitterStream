@@ -20,6 +20,8 @@ import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by Stenopolz on 07.08.2016.
+ * Application override class
+ * Written in Java for Dagger support
  */
 public class App extends Application {
 

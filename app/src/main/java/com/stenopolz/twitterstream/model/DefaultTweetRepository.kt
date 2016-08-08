@@ -10,6 +10,7 @@ import rx.Observable
 import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Stenopolz on 07.08.2016.
@@ -20,6 +21,11 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
     override fun getTweets(searchQuery: String): Observable<Tweet> {
         return api.getFeed(searchQuery, "en")
                 .subscribeOn(Schedulers.io())
+                .retryWhen({ errors ->
+                    errors
+                            .zipWith(Observable.range(0, Int.MAX_VALUE), { any: Any?, i: Int -> i })
+                            .flatMap({ Observable.timer(1 * Math.pow(2.toDouble(), it.toDouble()).toLong(), TimeUnit.MINUTES) })
+                })
                 .flatMap(TransformBodyToStrings())
                 .map(ParseTweetObjects(objectMapper))
                 .filter({ tweet -> tweet != null })
@@ -47,7 +53,10 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
             var tweet: Tweet? = null
             try {
                 val tweetObject = objectMapper.readValue(string, TweetObject::class.java)
-                tweet = Tweet(tweetObject.text, tweetObject.createdAt, tweetObject.user.name, tweetObject.user.nickname)
+                if (tweetObject.text != null && tweetObject.createdAt != null && tweetObject.user != null &&
+                        tweetObject.user.name != null && tweetObject.user.nickname != null) {
+                    tweet = Tweet(tweetObject.text, tweetObject.createdAt, tweetObject.user.name, tweetObject.user.nickname)
+                }
             } catch (e: JsonMappingException) {
                 e.printStackTrace()
             } catch (e: JsonParseException) {

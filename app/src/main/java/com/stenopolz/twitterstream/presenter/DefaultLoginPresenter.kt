@@ -4,13 +4,18 @@ import com.stenopolz.twitterstream.view.LoginView
 
 /**
  * Created by Stenopolz on 07.08.2016.
+ * Default implementation of login presenter
  */
-class DefaultLoginPresenter(view: LoginView) : LoginPresenter {
+class DefaultLoginPresenter(val view: LoginView) : LoginPresenter {
     override fun handleLoginSuccess() {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        view.showMainScreen()
     }
 
     override fun handleLoginFailed(exception: Exception) {
-        throw UnsupportedOperationException("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (exception.message != null) {
+            view.showError(exception.message as String)
+        } else {
+            view.showError("Unknown error occured")
+        }
     }
 }

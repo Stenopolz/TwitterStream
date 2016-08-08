@@ -6,4 +6,5 @@ package com.stenopolz.twitterstream.view
  */
 interface LoginView {
     fun showError(message: String)
+    fun showMainScreen()
 }
