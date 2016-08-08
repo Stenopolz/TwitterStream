@@ -11,7 +11,7 @@
         android:id="@+id/start_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start stream"/>
+        android:text="@string/start_stream_button_title"/>
 
     <Button
         android:id="@+id/stop_button"
@@ -21,7 +21,7 @@
         android:layout_alignTop="@id/start_button"
         android:layout_toRightOf="@id/start_button"
         android:enabled="false"
-        android:text="Stop stream"/>
+        android:text="@string/stop_stream_button_title"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"

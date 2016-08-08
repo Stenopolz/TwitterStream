@@ -3,8 +3,6 @@ package com.stenopolz.twitterstream.model.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.util.Date;
-
 /**
  * Created by Stenopolz on 07.08.2016.
  * Defines model for Tweet object

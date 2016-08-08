@@ -4,7 +4,6 @@ import com.stenopolz.twitterstream.model.TweetRepository
 import com.stenopolz.twitterstream.model.models.Tweet
 import com.stenopolz.twitterstream.view.MainView
 import rx.Subscription
-import rx.android.schedulers.AndroidSchedulers
 
 /**
  * Created by Stenopolz on 07.08.2016.
