@@ -13,7 +13,6 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), MainView {
 
     @Inject
-
     lateinit var presenter: MainPresenter
     @Inject
     lateinit var repository: TweetRepository
