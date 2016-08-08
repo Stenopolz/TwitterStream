@@ -28,6 +28,7 @@ project.ext {
     jacksonVersion = '2.6.4'
     daggerVersion = '2.4'
     rxAndroidVersion = '1.1.0'
+    mockitoVersion = '1.10.19'
 }
 
 task clean(type: Delete) {

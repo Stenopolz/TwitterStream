@@ -8,6 +8,7 @@ import com.stenopolz.twitterstream.model.models.TweetObject
 import okhttp3.ResponseBody
 import retrofit2.adapter.rxjava.HttpException
 import rx.Observable
+import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Func1
 import rx.schedulers.Schedulers
 import java.io.IOException
@@ -23,11 +24,12 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
         return api.getFeed(searchQuery, "en")
                 .subscribeOn(Schedulers.io())
                 .flatMap(TransformBodyToStrings())
-                .retryWhen(handle420Error())
+                .retryWhen(handleHTTP420Error())
                 .retryWhen(handleHTTPError())
                 .retryWhen(handleIOException())
                 .map(ParseTweetObjects(objectMapper))
                 .filter({ tweet -> tweet != null })
+                .observeOn(AndroidSchedulers.mainThread())
     }
 
     /*
@@ -80,7 +82,7 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
         Note that every HTTP 420 received increases the time you must wait
         until rate limiting will no longer will be in effect for your account.
      */
-    private fun handle420Error(): (Observable<out Throwable>) -> Observable<Long> {
+    private fun handleHTTP420Error(): (Observable<out Throwable>) -> Observable<Long> {
         return { errors ->
             errors.flatMap({
                 if (it is HttpException && it.code() == 420) {

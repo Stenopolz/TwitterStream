@@ -22,7 +22,6 @@ class DefaultMainPresenter(private val view: MainView, private val repository: T
         view.setStartEnabled(false)
         view.setStopEnabled(true)
         subscription = repository.getTweets("android")
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(onNextTweet(), onError())
     }
 
