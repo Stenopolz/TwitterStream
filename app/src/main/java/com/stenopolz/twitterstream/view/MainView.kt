@@ -11,4 +11,5 @@ interface MainView {
     fun setStopEnabled(enabled: Boolean)
     fun showTweet(tweet: Tweet)
     fun showError(message: String)
+    fun showLoginScreen()
 }

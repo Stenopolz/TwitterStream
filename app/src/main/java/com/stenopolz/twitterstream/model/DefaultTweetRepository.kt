@@ -62,7 +62,7 @@ class DefaultTweetRepository(val api: TwitterApi, val objectMapper: ObjectMapper
     private fun handleHTTPError(): (Observable<out Throwable>) -> Observable<Long> {
         return { errors ->
             errors.flatMap({
-                if (it is HttpException) {
+                if (it is HttpException && it.code() != 401) {
                     Observable.just(it)
                 } else {
                     Observable.error(it as Throwable)

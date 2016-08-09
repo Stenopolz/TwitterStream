@@ -3,6 +3,7 @@ package com.stenopolz.twitterstream.presenter
 import com.stenopolz.twitterstream.model.TweetRepository
 import com.stenopolz.twitterstream.model.models.Tweet
 import com.stenopolz.twitterstream.view.MainView
+import retrofit2.adapter.rxjava.HttpException
 import rx.Subscription
 
 /**
@@ -27,7 +28,12 @@ class DefaultMainPresenter(private val view: MainView, private val repository: T
     private fun onNextTweet(): (Tweet) -> Unit = { view.showTweet(it) }
 
     private fun onError(): (Throwable) -> Unit = {
-        view.showError(if (it.message != null) it.message as String else "Unknown error occured!")
+        if (it is HttpException && it.code() == 401) {
+            view.showError("Authorization failed, please, log in again")
+            view.showLoginScreen()
+        } else {
+            view.showError(if (it.message != null) it.message as String else "Unknown error occured!")
+        }
     }
 
     override fun stopUpdates() {
